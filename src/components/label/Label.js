@@ -3,7 +3,7 @@ import styled from "styled-components";
 const LabelStyles = styled.label`
     cursor: pointer;
     font-weight: 600;
-    font-size: 20px;
+    font-size: 14px;
     color: ${(props) => props.theme.greydark};
 `;
 
