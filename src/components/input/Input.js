@@ -1,5 +1,3 @@
-import EyeIcon from "components/icon/EyeIcon";
-import React, { Children } from "react";
 import { useController } from "react-hook-form";
 import styled from "styled-components";
 

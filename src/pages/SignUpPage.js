@@ -6,14 +6,14 @@ import { Input } from "components/input";
 import { Label } from "components/label";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import styled from "styled-components";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { toast } from "react-toastify";
 import { auth, db } from "../firebase/firebase-config";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { addDoc, collection } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import AuthenticationPage from "./AuthenticationPage";
 
 const schema = yup.object({
     fullname: yup.string().required("Please enter your fullname"),
@@ -26,23 +26,6 @@ const schema = yup.object({
         .min(8, "Your password must be at least 8 characters or greater")
         .required("Please enter your password"),
 });
-
-const SignUpStyles = styled.div`
-    min-height: 100vh;
-    padding: 40px;
-    .form {
-        width: 100%;
-        max-width: 600px;
-        margin: 0 auto;
-    }
-    .logo {
-        margin: 0 auto 20px;
-    }
-    .headline {
-        text-align: center;
-        color: ${(props) => props.theme.primary};
-    }
-`;
 
 const SignUpPage = () => {
     const navigate = useNavigate();
@@ -84,51 +67,49 @@ const SignUpPage = () => {
         navigate("/");
     };
     return (
-        <SignUpStyles>
-            <div className="container">
-                <form
-                    onSubmit={handleSubmit(handleSubmitForm)}
-                    className="form">
-                    <img className="logo" srcSet="monkey.png 2x" alt="" />
-                    <h1 className="headline">Monkey Blogging</h1>
-                    <Field>
-                        <Label htmlFor="fullname">Fullname</Label>
-                        <Input
-                            control={control}
-                            name="fullname"
-                            placeholder="Enter your fullname"></Input>
-                    </Field>
-                    <Field>
-                        <Label htmlFor="email">Email address</Label>
-                        <Input
-                            control={control}
-                            name="email"
-                            placeholder="Enter your email address"></Input>
-                    </Field>
-                    <Field>
-                        <Label htmlFor="password">Password</Label>
-                        <Input
-                            type={inputType}
-                            control={control}
-                            name="password"
-                            placeholder="Enter your password">
-                            {inputType === "password" ? (
-                                <EyeCloseIcon
-                                    onClick={handleInputType}></EyeCloseIcon>
-                            ) : (
-                                <EyeIcon onClick={handleInputType}></EyeIcon>
-                            )}
-                        </Input>
-                    </Field>
-                    <Button
-                        isLoading={isSubmitting}
-                        disable={isSubmitting}
-                        type="submit">
-                        Submit
-                    </Button>
-                </form>
-            </div>
-        </SignUpStyles>
+        <AuthenticationPage>
+            <form onSubmit={handleSubmit(handleSubmitForm)}>
+                <Field>
+                    <Label htmlFor="fullname">Fullname</Label>
+                    <Input
+                        control={control}
+                        name="fullname"
+                        placeholder="Enter your fullname"></Input>
+                </Field>
+                <Field>
+                    <Label htmlFor="email">Email address</Label>
+                    <Input
+                        control={control}
+                        name="email"
+                        placeholder="Enter your email address"></Input>
+                </Field>
+                <Field>
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                        type={inputType}
+                        control={control}
+                        name="password"
+                        placeholder="Enter your password">
+                        {inputType === "password" ? (
+                            <EyeCloseIcon
+                                onClick={handleInputType}></EyeCloseIcon>
+                        ) : (
+                            <EyeIcon onClick={handleInputType}></EyeIcon>
+                        )}
+                    </Input>
+                </Field>
+                <div className="question">
+                    You already have an account{" "}
+                    <NavLink to={"/sign-in"}>Sign In</NavLink>
+                </div>
+                <Button
+                    isLoading={isSubmitting}
+                    disable={isSubmitting}
+                    type="submit">
+                    Submit
+                </Button>
+            </form>
+        </AuthenticationPage>
     );
 };
 
