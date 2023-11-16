@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { PropTypes } from "prop-types";
 
 const ButtonStyles = styled.button`
-    height: 55px;
+    height: ${(props) => props.height || "55px"};
     color: white;
     background-image: linear-gradient(
         to right bottom,
@@ -12,7 +12,7 @@ const ButtonStyles = styled.button`
         ${(props) => props.theme.secondary}
     );
     max-width: 300px;
-    width: 100%;
+    padding: 12px;
     font-size: 18px;
     border-radius: 8px;
     font-weight: 600;
@@ -37,9 +37,11 @@ const Button = ({
     type = "button",
     isLoading,
     disable,
+    ...props
 }) => {
     return (
         <ButtonStyles
+            {...props}
             disabled={disable}
             type={type}
             className={className}

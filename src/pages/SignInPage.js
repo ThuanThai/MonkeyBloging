@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import AuthenticationPage from "./AuthenticationPage";
 import { Field } from "components/field";
 import { Label } from "components/label";
@@ -12,6 +12,8 @@ import * as yup from "yup";
 import { toast } from "react-toastify";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase/firebase-config";
+import EyeCloseIcon from "components/icon/EyeCloseIcon";
+import EyeIcon from "components/icon/EyeIcon";
 const schema = yup.object({
     email: yup
         .string()
@@ -26,7 +28,7 @@ const schema = yup.object({
 const SignInPage = () => {
     const navigate = useNavigate();
     const { userInfo } = useAuth();
-
+    const [inputType, setInputType] = useState("password");
     useEffect(() => {
         document.title = "Login Page";
         if (userInfo?.email) navigate("/");
@@ -49,9 +51,24 @@ const SignInPage = () => {
         }
     }, [errors]);
 
-    const handleSignIn = (values) => {
+    const handleSignIn = async (values) => {
         if (!isValid) return;
-        signInWithEmailAndPassword(auth, values.email, values.password);
+        try {
+            await signInWithEmailAndPassword(
+                auth,
+                values.email,
+                values.password
+            );
+            navigate("/");
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    const handleInputType = () => {
+        inputType === "password"
+            ? setInputType("text")
+            : setInputType("password");
     };
 
     return (
@@ -68,16 +85,24 @@ const SignInPage = () => {
                 <Field>
                     <Label htmlFor="password">Password</Label>
                     <Input
-                        placeholder="Enter your password"
+                        type={inputType}
                         control={control}
                         name="password"
-                        type="password"></Input>
+                        placeholder="Enter your password">
+                        {inputType === "password" ? (
+                            <EyeCloseIcon
+                                onClick={handleInputType}></EyeCloseIcon>
+                        ) : (
+                            <EyeIcon onClick={handleInputType}></EyeIcon>
+                        )}
+                    </Input>
                 </Field>
                 <div className="question">
                     Don't have an account yet?{" "}
                     <NavLink to={"/sign-up"}>Sign Up</NavLink>
                 </div>
                 <Button
+                    style={{ width: "100%" }}
                     isLoading={isSubmitting}
                     disable={isSubmitting}
                     type="submit">

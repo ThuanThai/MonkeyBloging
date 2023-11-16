@@ -103,6 +103,7 @@ const SignUpPage = () => {
                     <NavLink to={"/sign-in"}>Sign In</NavLink>
                 </div>
                 <Button
+                    style={{ width: "100%" }}
                     isLoading={isSubmitting}
                     disable={isSubmitting}
                     type="submit">
