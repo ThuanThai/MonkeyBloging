@@ -1,10 +1,8 @@
 import { Button } from "components/button";
 import { Field } from "components/field";
-import EyeCloseIcon from "components/icon/EyeCloseIcon";
-import EyeIcon from "components/icon/EyeIcon";
 import { Input } from "components/input";
 import { Label } from "components/label";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -14,6 +12,7 @@ import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { addDoc, collection } from "firebase/firestore";
 import { NavLink, useNavigate } from "react-router-dom";
 import AuthenticationPage from "./AuthenticationPage";
+import InputPassword from "components/input/InputPassword";
 
 const schema = yup.object({
     fullname: yup.string().required("Please enter your fullname"),
@@ -41,13 +40,6 @@ const SignUpPage = () => {
             toast.error(arrError[0].message);
         }
     }, [errors]);
-    const [inputType, setInputType] = useState("password");
-    const handleInputType = () => {
-        inputType === "password"
-            ? setInputType("text")
-            : setInputType("password");
-    };
-
     const handleSubmitForm = async (values) => {
         if (!isValid) return;
         console.log("aaa");
@@ -85,24 +77,15 @@ const SignUpPage = () => {
                 </Field>
                 <Field>
                     <Label htmlFor="password">Password</Label>
-                    <Input
-                        type={inputType}
-                        control={control}
-                        name="password"
-                        placeholder="Enter your password">
-                        {inputType === "password" ? (
-                            <EyeCloseIcon
-                                onClick={handleInputType}></EyeCloseIcon>
-                        ) : (
-                            <EyeIcon onClick={handleInputType}></EyeIcon>
-                        )}
-                    </Input>
+                    <InputPassword control={control}></InputPassword>
                 </Field>
                 <div className="question">
                     You already have an account{" "}
                     <NavLink to={"/sign-in"}>Sign In</NavLink>
                 </div>
                 <Button
+                    primary
+                    center
                     style={{ width: "100%" }}
                     isLoading={isSubmitting}
                     disable={isSubmitting}

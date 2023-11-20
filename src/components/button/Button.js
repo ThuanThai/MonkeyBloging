@@ -1,16 +1,28 @@
 import { LoadingSpinner } from "components/loading";
 import React from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { PropTypes } from "prop-types";
 
 const ButtonStyles = styled.button`
     height: ${(props) => props.height || "55px"};
-    color: white;
-    background-image: linear-gradient(
-        to right bottom,
-        ${(props) => props.theme.primary},
-        ${(props) => props.theme.secondary}
-    );
+    color: ${(props) =>
+        props.primary
+            ? "white"
+            : css`
+                  ${(props) => props.theme.primary};
+              `};
+    ${(props) =>
+        props.primary
+            ? css`
+                  background-image: linear-gradient(
+                      to right bottom,
+                      ${(props) => props.theme.primary},
+                      ${(props) => props.theme.secondary}
+                  );
+              `
+            : css`
+                  background-color: white;
+              `};
     max-width: 300px;
     padding: 12px;
     font-size: 18px;
@@ -19,7 +31,7 @@ const ButtonStyles = styled.button`
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto;
+    margin: ${(props) => (props.center ? "0px auto" : "0px")};
     opacity: ${(props) => (props.disabled ? "0.5" : "1")};
     cursor: pointer;
 `;
