@@ -6,24 +6,32 @@ import { Input } from "components/input";
 import { Label } from "components/label";
 import React from "react";
 import { useForm } from "react-hook-form";
+import slugify from "slugify";
 import styled from "styled-components";
+import { postStatus } from "utils/constants";
 const PostAddNewStyles = styled.div``;
 
 const PostAddNew = () => {
-    const { control, watch, setValue } = useForm({
+    const { control, watch, setValue, handleSubmit } = useForm({
         mode: "onChange",
         defaultValues: {
-            status: "",
+            title: "",
+            slug: "",
+            status: 2,
             category: "",
         },
     });
     const watchStatus = watch("status");
     const watchCategory = watch("category");
-    console.log("PostAddNew ~ watchCategory", watchCategory);
+    const addPostHandler = async (values) => {
+        const cloneVal = { ...values };
+        cloneVal.slug = slugify(cloneVal.slug || cloneVal.title);
+        console.log(cloneVal);
+    };
     return (
         <PostAddNewStyles>
             <h1 className="dashboard-heading">Add new post</h1>
-            <form>
+            <form onSubmit={handleSubmit(addPostHandler)}>
                 <div className="grid grid-cols-2 mb-10 gap-x-10">
                     <Field>
                         <Label>Title</Label>
@@ -47,25 +55,37 @@ const PostAddNew = () => {
                             <Radio
                                 name="status"
                                 control={control}
-                                checked={watchStatus === "approved"}
-                                onClick={() => setValue("status", "approved")}
-                                value="approved">
+                                checked={
+                                    Number(watchStatus) === postStatus.APPROVE
+                                }
+                                onClick={() =>
+                                    setValue("status", postStatus.APPROVE)
+                                }
+                                value={postStatus.APPROVE}>
                                 Approved
                             </Radio>
                             <Radio
                                 name="status"
                                 control={control}
-                                checked={watchStatus === "pending"}
-                                onClick={() => setValue("status", "pending")}
-                                value="pending">
+                                checked={
+                                    Number(watchStatus) === postStatus.PENDING
+                                }
+                                onClick={() =>
+                                    setValue("status", postStatus.PENDING)
+                                }
+                                value={postStatus.PENDING}>
                                 Pending
                             </Radio>
                             <Radio
                                 name="status"
                                 control={control}
-                                checked={watchStatus === "reject"}
-                                onClick={() => setValue("status", "reject")}
-                                value="reject">
+                                checked={
+                                    Number(watchStatus) === postStatus.REJECT
+                                }
+                                onClick={() =>
+                                    setValue("status", postStatus.REJECT)
+                                }
+                                value={postStatus.REJECT}>
                                 Reject
                             </Radio>
                         </div>
@@ -90,7 +110,7 @@ const PostAddNew = () => {
                     </Field>
                     <Field></Field>
                 </div>
-                <Button type="submit" className="mx-auto">
+                <Button primary type="submit" className="mx-auto">
                     Add new post
                 </Button>
             </form>

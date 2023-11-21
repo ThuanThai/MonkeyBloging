@@ -8,3 +8,9 @@ export const theme = {
     grayF3: "#F3EDFF",
     gray6b: "#6B6B6B",
 };
+
+export const postStatus = {
+    APPROVE: 1,
+    PENDING: 2,
+    REJECT: 3,
+};
