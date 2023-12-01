@@ -11,6 +11,7 @@ import styled from "styled-components";
 import { postStatus } from "utils/constants";
 import ImageUpload from "components/imageupload/ImageUpload";
 import { useFirebasImage } from "hooks/useFirebasImage";
+import Toggle from "components/toggle/Toggle";
 const PostAddNewStyles = styled.div``;
 
 const PostAddNew = () => {
@@ -22,6 +23,7 @@ const PostAddNew = () => {
             status: 2,
             category: "",
             image: "",
+            hot: "false",
         },
     });
     const {
@@ -32,6 +34,7 @@ const PostAddNew = () => {
         handleDeleteImage,
     } = useFirebasImage(setValue, getValues);
     const watchStatus = watch("status");
+    const watchHot = watch("hot");
     // const watchCategory = watch("category");
     const addPostHandler = async (values) => {
         const cloneVal = { ...values };
@@ -118,6 +121,14 @@ const PostAddNew = () => {
                             <Dropdown.Option>Developer</Dropdown.Option>
                         </Dropdown>
                     </Field>
+                    <Field>
+                        <Label>Feature Post</Label>
+                        <Toggle
+                            onClick={() => setValue("hot", !watchHot)}
+                            on={watchHot}></Toggle>
+                    </Field>
+                </div>
+                <div className="grid grid-cols-2 mb-10 gap-x-10">
                     <Field>
                         <Label>Image</Label>
                         <ImageUpload
