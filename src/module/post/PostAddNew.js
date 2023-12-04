@@ -4,7 +4,7 @@ import { Dropdown } from "components/dropdown";
 import { Field } from "components/field";
 import { Input } from "components/input";
 import { Label } from "components/label";
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import slugify from "slugify";
 import styled from "styled-components";
@@ -12,6 +12,8 @@ import { postStatus } from "utils/constants";
 import ImageUpload from "components/imageupload/ImageUpload";
 import { useFirebasImage } from "hooks/useFirebasImage";
 import Toggle from "components/toggle/Toggle";
+import { collection, getDocs, query } from "firebase/firestore";
+import { db } from "../../firebase/firebase-config";
 const PostAddNewStyles = styled.div``;
 
 const PostAddNew = () => {
@@ -41,6 +43,24 @@ const PostAddNew = () => {
         cloneVal.slug = slugify(cloneVal.slug || cloneVal.title);
         // handleUpLoadImage(cloneVal.image);
     };
+
+    useEffect(() => {
+        const getData = async () => {
+            const colRef = collection(db, "categories");
+            const q = query(colRef);
+            const querySnapshot = await getDocs(q);
+            let result = [];
+            querySnapshot.forEach((doc) => {
+                result.push({ id: doc.id, ...doc.data() });
+            });
+            console.log(
+                "🚀 ~ file: PostAddNew.js:55 ~ querySnapshot.forEach ~ result:",
+                result
+            );
+        };
+        getData();
+    }, []);
+
     return (
         <PostAddNewStyles>
             <h1 className="dashboard-heading">Add new post</h1>
@@ -59,6 +79,25 @@ const PostAddNew = () => {
                             control={control}
                             placeholder="Enter your slug"
                             name="slug"></Input>
+                    </Field>
+                </div>
+                <div className="grid grid-cols-2 mb-10 gap-x-10">
+                    <Field>
+                        <Label>Category</Label>
+                        <Dropdown>
+                            <Dropdown.Option>Knowledge</Dropdown.Option>
+                            <Dropdown.Option>Blockchain</Dropdown.Option>
+                            <Dropdown.Option>Setup</Dropdown.Option>
+                            <Dropdown.Option>Nature</Dropdown.Option>
+                            <Dropdown.Option>Developer</Dropdown.Option>
+                        </Dropdown>
+                    </Field>
+
+                    <Field>
+                        <Label>Author</Label>
+                        <Input
+                            control={control}
+                            placeholder="Find the author"></Input>
                     </Field>
                 </div>
                 <div className="grid grid-cols-2 mb-10 gap-x-10">
@@ -102,24 +141,6 @@ const PostAddNew = () => {
                                 Reject
                             </Radio>
                         </div>
-                    </Field>
-                    <Field>
-                        <Label>Author</Label>
-                        <Input
-                            control={control}
-                            placeholder="Find the author"></Input>
-                    </Field>
-                </div>
-                <div className="grid grid-cols-2 mb-10 gap-x-10">
-                    <Field>
-                        <Label>Category</Label>
-                        <Dropdown>
-                            <Dropdown.Option>Knowledge</Dropdown.Option>
-                            <Dropdown.Option>Blockchain</Dropdown.Option>
-                            <Dropdown.Option>Setup</Dropdown.Option>
-                            <Dropdown.Option>Nature</Dropdown.Option>
-                            <Dropdown.Option>Developer</Dropdown.Option>
-                        </Dropdown>
                     </Field>
                     <Field>
                         <Label>Feature Post</Label>
