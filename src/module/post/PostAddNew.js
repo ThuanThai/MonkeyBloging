@@ -4,7 +4,7 @@ import { Dropdown } from "components/dropdown";
 import { Field } from "components/field";
 import { Input } from "components/input";
 import { Label } from "components/label";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import slugify from "slugify";
 import styled from "styled-components";
@@ -12,26 +12,44 @@ import { postStatus } from "utils/constants";
 import ImageUpload from "components/imageupload/ImageUpload";
 import { useFirebasImage } from "hooks/useFirebasImage";
 import Toggle from "components/toggle/Toggle";
-import { collection, getDocs, query } from "firebase/firestore";
+import {
+    addDoc,
+    collection,
+    getDocs,
+    query,
+    serverTimestamp,
+} from "firebase/firestore";
 import { db } from "../../firebase/firebase-config";
+import { toast } from "react-toastify";
 const PostAddNewStyles = styled.div``;
 
 const PostAddNew = () => {
-    const { control, watch, setValue, handleSubmit, getValues } = useForm({
+    const {
+        control,
+        watch,
+        setValue,
+        handleSubmit,
+        getValues,
+        reset,
+        formState: { isValid },
+    } = useForm({
         mode: "onChange",
         defaultValues: {
             title: "",
             slug: "",
             status: 2,
             category: "",
+            hot: "true",
             image: "",
-            hot: "false",
         },
     });
     const {
         progress,
+        setProgress,
         imageTitle,
+        setImageTitle,
         imageURL,
+        setImageURL,
         handleUpLoadImage,
         handleDeleteImage,
     } = useFirebasImage(setValue, getValues);
@@ -39,11 +57,40 @@ const PostAddNew = () => {
     const watchHot = watch("hot");
     // const watchCategory = watch("category");
     const addPostHandler = async (values) => {
+        if (!isValid) return;
         const cloneVal = { ...values };
-        cloneVal.slug = slugify(cloneVal.slug || cloneVal.title);
-        // handleUpLoadImage(cloneVal.image);
+        cloneVal.slug = slugify(
+            cloneVal.slug.toLowerCase() || cloneVal.title.toLowerCase()
+        );
+        const colRef = collection(db, "posts");
+        await addDoc(colRef, {
+            ...cloneVal,
+            createdAt: serverTimestamp(),
+        });
+        toast.success("Create new post successfully");
+        reset({
+            title: "",
+            slug: "",
+            status: 2,
+            category: "",
+            hot: "true",
+            image: "",
+        });
+        setSelectedCategory({});
+        setImageTitle("");
+        setImageURL("");
+        setProgress(0);
+        console.log(values);
     };
 
+    const handleClickOption = (option) => {
+        if (!option) return;
+        setSelectedCategory(option);
+        setValue("category", option.name);
+    };
+
+    const [selectedCategory, setSelectedCategory] = useState({});
+    const [categories, setCatgories] = useState([]);
     useEffect(() => {
         const getData = async () => {
             const colRef = collection(db, "categories");
@@ -53,10 +100,7 @@ const PostAddNew = () => {
             querySnapshot.forEach((doc) => {
                 result.push({ id: doc.id, ...doc.data() });
             });
-            console.log(
-                "🚀 ~ file: PostAddNew.js:55 ~ querySnapshot.forEach ~ result:",
-                result
-            );
+            setCatgories(result);
         };
         getData();
     }, []);
@@ -85,17 +129,33 @@ const PostAddNew = () => {
                     <Field>
                         <Label>Category</Label>
                         <Dropdown>
-                            <Dropdown.Option>Knowledge</Dropdown.Option>
-                            <Dropdown.Option>Blockchain</Dropdown.Option>
-                            <Dropdown.Option>Setup</Dropdown.Option>
-                            <Dropdown.Option>Nature</Dropdown.Option>
-                            <Dropdown.Option>Developer</Dropdown.Option>
+                            <Dropdown.Select placeholder="Select the category"></Dropdown.Select>
+                            <Dropdown.List>
+                                {categories.length > 0 &&
+                                    categories.map((item) => (
+                                        <Dropdown.Option
+                                            key={item.id}
+                                            onClick={() =>
+                                                handleClickOption(item)
+                                            }>
+                                            {item.name}
+                                        </Dropdown.Option>
+                                    ))}
+                            </Dropdown.List>
                         </Dropdown>
+                        <div>
+                            {selectedCategory.name && (
+                                <span className="inline-block p-3 text-sm font-medium text-green-700 bg-green-200 rounded-md">
+                                    {selectedCategory.name}
+                                </span>
+                            )}
+                        </div>
                     </Field>
 
                     <Field>
                         <Label>Author</Label>
                         <Input
+                            name="author"
                             control={control}
                             placeholder="Find the author"></Input>
                     </Field>

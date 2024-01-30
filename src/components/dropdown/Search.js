@@ -1,4 +1,4 @@
-import { useDropdown } from "contexts/dropdown-context";
+import { useDropdown } from "components/dropdown/dropdown-context";
 import React from "react";
 
 const Search = ({ placeholder, ...props }) => {
@@ -8,7 +8,7 @@ const Search = ({ placeholder, ...props }) => {
             <input
                 type="text"
                 placeholder={placeholder}
-                className="p-4 outline-none w-full border border-gray-200 rounded"
+                className="w-full p-4 border border-gray-200 rounded outline-none"
                 onChange={onChange}
                 {...props}
             />

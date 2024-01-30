@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 const Toggle = ({ on, onClick, ...props }) => {
     return (
         <label>
-            <input checked={on} type="checkbox" className="hidden-input" />
+            <input value={on} type="checkbox" className="hidden-input" />
             <div
                 {...props}
                 onClick={onClick}

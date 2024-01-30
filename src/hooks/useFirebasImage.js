@@ -15,11 +15,9 @@ export function useFirebasImage(setValue, getValues, name = "image") {
 
     const handleUpLoadImage = (e) => {
         const file = e.target.files[0];
-        setValue(name, file);
         setImageTitle(file.name);
-
         if (!file) return;
-        const storageRef = ref(storage, "images/" + file.name);
+        const storageRef = ref(storage, "images/" + imageTitle);
         const uploadTask = uploadBytesResumable(storageRef, file);
         uploadTask.on(
             "state_changed",
@@ -47,6 +45,7 @@ export function useFirebasImage(setValue, getValues, name = "image") {
                 // Upload completed successfully, now we can get the download URL
                 getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
                     setImageURL(downloadURL);
+                    setValue("image", downloadURL);
                 });
             }
         );

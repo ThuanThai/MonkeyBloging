@@ -68,22 +68,20 @@ const PostFeatureItemStyles = styled.div`
         height: 272px;
     }
 `;
-const PostFeatureItem = () => {
+const PostFeatureItem = ({ data, ...props }) => {
+    const { author, category, hot, image, slug, status, title, createdAt } =
+        data;
     return (
         <PostFeatureItemStyles>
-            <img
-                src="https://images.unsplash.com/photo-1614624532983-4ce03382d63d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2662&q=80"
-                alt="unsplash"
-                className="post-image"
-            />
+            <img src={image} alt="unsplash" className="post-image" />
             <div className="post-overlay"></div>
             <div className="post-content">
                 <div className="post-top">
-                    <PostCategory type="primary">knowledge</PostCategory>
+                    <PostCategory type="primary">{category}</PostCategory>
                     <div className="post-info">
-                        <span className="post-time">Mar 23</span>
+                        <span className="post-time">{createdAt}</span>
                         <span className="post-dot"></span>
-                        <span className="post-author">Andiez Le</span>
+                        <span className="post-author">{author}</span>
                     </div>
                 </div>
                 <h3 className="post-title">
