@@ -31,8 +31,7 @@ const DashBoardHeader = () => {
                     navigate("/dashboard");
                 }}
                 primary
-                className="header-button"
-                to="/dashboard">
+                className="header-button">
                 Write new post
             </Button>
             <div className="header-avatar">

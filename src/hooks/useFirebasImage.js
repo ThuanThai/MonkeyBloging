@@ -7,7 +7,7 @@ import {
     uploadBytesResumable,
 } from "firebase/storage";
 
-export function useFirebasImage(setValue, getValues, name = "image") {
+export function useFirebasImage(setValue, getValues) {
     const [progress, setProgress] = useState(0);
     const [imageURL, setImageURL] = useState("");
     const [imageTitle, setImageTitle] = useState("");
@@ -17,7 +17,7 @@ export function useFirebasImage(setValue, getValues, name = "image") {
         const file = e.target.files[0];
         setImageTitle(file.name);
         if (!file) return;
-        const storageRef = ref(storage, "images/" + imageTitle);
+        const storageRef = ref(storage, `images/${file.name}`);
         const uploadTask = uploadBytesResumable(storageRef, file);
         uploadTask.on(
             "state_changed",
@@ -44,6 +44,7 @@ export function useFirebasImage(setValue, getValues, name = "image") {
             () => {
                 // Upload completed successfully, now we can get the download URL
                 getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                    console.log(downloadURL);
                     setImageURL(downloadURL);
                     setValue("image", downloadURL);
                 });

@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import PostCategory from "./PostCategory";
+import { db } from "../../firebase/firebase-config";
+import { doc, getDoc } from "firebase/firestore";
 const PostFeatureItemStyles = styled.div`
     width: 100%;
     border-radius: 16px;
@@ -69,24 +71,40 @@ const PostFeatureItemStyles = styled.div`
     }
 `;
 const PostFeatureItem = ({ data, ...props }) => {
-    const { author, category, hot, image, slug, status, title, createdAt } =
-        data;
+    const [user, setUser] = useState();
+    const [cate, setCate] = useState();
+    const { author, category, image, title } = data;
+    useEffect(() => {
+        const fetch = async () => {
+            const docRef = doc(db, "users", author);
+            const docSnap = await getDoc(docRef);
+            setUser(docSnap.data());
+        };
+        fetch();
+    }, [author]);
+    console.log(user);
+    useEffect(() => {
+        const fetch = async () => {
+            const docRef = doc(db, "categories", category);
+            const docSnap = await getDoc(docRef);
+            setCate(docSnap.data());
+        };
+        fetch();
+    }, [category]);
+    if (!data) return;
     return (
         <PostFeatureItemStyles>
             <img src={image} alt="unsplash" className="post-image" />
             <div className="post-overlay"></div>
             <div className="post-content">
                 <div className="post-top">
-                    <PostCategory type="primary">{category}</PostCategory>
+                    <PostCategory type="primary">{cate?.name}</PostCategory>
                     <div className="post-info">
-                        <span className="post-time">{createdAt}</span>
                         <span className="post-dot"></span>
-                        <span className="post-author">{author}</span>
+                        <span className="post-author">{user?.fullname}</span>
                     </div>
                 </div>
-                <h3 className="post-title">
-                    Hướng dẫn setup phòng cực chill dành cho người mới toàn tập
-                </h3>
+                <h3 className="post-title">{title}</h3>
             </div>
         </PostFeatureItemStyles>
     );

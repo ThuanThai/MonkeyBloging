@@ -21,9 +21,17 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebase/firebase-config";
 import { toast } from "react-toastify";
+import { useAuth } from "contexts/auth-context";
 const PostAddNewStyles = styled.div``;
 
 const PostAddNew = () => {
+    const { userInfo } = useAuth();
+    const [userId, setUserId] = useState();
+    const [loading, setLoading] = useState(false);
+    useEffect(() => {
+        setUserId(userInfo.uid);
+        setValue("author", userId);
+    }, [userInfo]);
     const {
         control,
         watch,
@@ -35,6 +43,7 @@ const PostAddNew = () => {
     } = useForm({
         mode: "onChange",
         defaultValues: {
+            author: "",
             title: "",
             slug: "",
             status: 2,
@@ -58,17 +67,27 @@ const PostAddNew = () => {
     // const watchCategory = watch("category");
     const addPostHandler = async (values) => {
         if (!isValid) return;
+        console.log(values);
+        setLoading(true);
         const cloneVal = { ...values };
         cloneVal.slug = slugify(
             cloneVal.slug.toLowerCase() || cloneVal.title.toLowerCase()
         );
         const colRef = collection(db, "posts");
-        await addDoc(colRef, {
-            ...cloneVal,
-            createdAt: serverTimestamp(),
-        });
+        try {
+            await addDoc(colRef, {
+                ...cloneVal,
+                createdAt: serverTimestamp(),
+            });
+        } catch (error) {
+            console.log(error);
+            setLoading(false);
+            return;
+        }
+        setLoading(true);
         toast.success("Create new post successfully");
         reset({
+            author: userId,
             title: "",
             slug: "",
             status: 2,
@@ -76,17 +95,17 @@ const PostAddNew = () => {
             hot: "true",
             image: "",
         });
+
         setSelectedCategory({});
         setImageTitle("");
         setImageURL("");
         setProgress(0);
-        console.log(values);
     };
 
     const handleClickOption = (option) => {
         if (!option) return;
         setSelectedCategory(option);
-        setValue("category", option.name);
+        setValue("category", option.id);
     };
 
     const [selectedCategory, setSelectedCategory] = useState({});
@@ -153,15 +172,6 @@ const PostAddNew = () => {
                     </Field>
 
                     <Field>
-                        <Label>Author</Label>
-                        <Input
-                            name="author"
-                            control={control}
-                            placeholder="Find the author"></Input>
-                    </Field>
-                </div>
-                <div className="grid grid-cols-2 mb-10 gap-x-10">
-                    <Field>
                         <Label>Status</Label>
                         <div className="flex items-center gap-x-5">
                             <Radio
@@ -202,12 +212,6 @@ const PostAddNew = () => {
                             </Radio>
                         </div>
                     </Field>
-                    <Field>
-                        <Label>Feature Post</Label>
-                        <Toggle
-                            onClick={() => setValue("hot", !watchHot)}
-                            on={watchHot}></Toggle>
-                    </Field>
                 </div>
                 <div className="grid grid-cols-2 mb-10 gap-x-10">
                     <Field>
@@ -219,8 +223,21 @@ const PostAddNew = () => {
                             onChange={handleUpLoadImage}
                             progress={progress}></ImageUpload>
                     </Field>
+                    <Field>
+                        <Label>Feature Post</Label>
+                        <Toggle
+                            onClick={() => setValue("hot", !watchHot)}
+                            on={watchHot}></Toggle>
+                    </Field>
                 </div>
-                <Button primary type="submit" className="mx-auto">
+
+                <Button
+                    center
+                    disable={loading}
+                    isLoading={loading}
+                    primary
+                    type="submit"
+                    className="w-[200px]">
                     Add new post
                 </Button>
             </form>

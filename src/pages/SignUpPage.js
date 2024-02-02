@@ -9,7 +9,7 @@ import * as yup from "yup";
 import { toast } from "react-toastify";
 import { auth, db } from "../firebase/firebase-config";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { addDoc, collection } from "firebase/firestore";
+import { collection, doc, setDoc } from "firebase/firestore";
 import { NavLink, useNavigate } from "react-router-dom";
 import AuthenticationPage from "./AuthenticationPage";
 import InputPassword from "components/input/InputPassword";
@@ -28,7 +28,6 @@ const schema = yup.object({
 
 const SignUpPage = () => {
     const navigate = useNavigate();
-
     const {
         control,
         handleSubmit,
@@ -42,15 +41,13 @@ const SignUpPage = () => {
     }, [errors]);
     const handleSubmitForm = async (values) => {
         if (!isValid) return;
-        console.log("aaa");
         await createUserWithEmailAndPassword(
             auth,
             values.email,
             values.password
         );
         await updateProfile(auth.currentUser, { displayName: values.fullname });
-        const colRef = collection(db, "users");
-        await addDoc(colRef, {
+        await setDoc(doc(db, "users", auth.currentUser.uid), {
             fullname: values.fullname,
             email: values.email,
             password: values.password,

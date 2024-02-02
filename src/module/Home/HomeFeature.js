@@ -27,8 +27,9 @@ const HomeFeature = () => {
             orderBy("createdAt", "desc"),
             limit(3)
         );
-        const result = [];
+
         onSnapshot(q, (snapshot) => {
+            const result = [];
             snapshot.forEach((doc) => {
                 result.push({
                     id: doc.id,
@@ -38,13 +39,14 @@ const HomeFeature = () => {
             setPostsFeature(result);
         });
     }, []);
+    if (postsFeature && postsFeature.length <= 0) return null;
     return (
         <HomeFeatureStyles className="home-block">
             <div className="container">
                 <Heading>Bài viết nổi bật</Heading>
                 <div className="grid-layout">
                     {postsFeature &&
-                        postsFeature.lenght > 0 &&
+                        postsFeature.length > 0 &&
                         postsFeature.map((item) => (
                             <PostFeatureItem
                                 data={item}

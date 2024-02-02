@@ -1,5 +1,7 @@
 import { Button } from "components/button";
 import { useAuth } from "contexts/auth-context";
+import { signOut } from "firebase/auth";
+import { auth } from "../../firebase/firebase-config";
 import React from "react";
 import { NavLink } from "react-router-dom";
 import styled from "styled-components";
@@ -143,11 +145,16 @@ const Header = () => {
                             Sign Up
                         </Button>
                     ) : (
-                        <div className="header-auth">
-                            <span>Welcome back, </span>
-                            <strong className="text-primary">
-                                {getLastName(userInfo?.displayName)}
-                            </strong>
+                        <div className="flex items-center gap-x-3">
+                            <div className="header-auth">
+                                <span>Welcome back, </span>
+                                <strong className="text-primary">
+                                    {getLastName(userInfo?.displayName)}
+                                </strong>
+                            </div>
+                            <button onClick={() => signOut(auth)}>
+                                Sign Out
+                            </button>
                         </div>
                     )}
                 </div>
