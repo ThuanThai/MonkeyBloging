@@ -3,7 +3,7 @@ import { useAuth } from "contexts/auth-context";
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebase/firebase-config";
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 const menuLinks = [
     {
@@ -80,6 +80,7 @@ function getLastName(name) {
 }
 const Header = () => {
     const { userInfo } = useAuth();
+    const navigate = useNavigate();
     return (
         <HeaderStyles>
             <div className="container">
@@ -141,8 +142,8 @@ const Header = () => {
                             type="button"
                             height="56px"
                             className="header-button"
-                            to="/sign-up">
-                            Sign Up
+                            onClick={() => navigate("/sign-in")}>
+                            Sign in
                         </Button>
                     ) : (
                         <div className="flex items-center gap-x-3">

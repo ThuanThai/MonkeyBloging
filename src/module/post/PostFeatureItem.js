@@ -3,11 +3,13 @@ import styled from "styled-components";
 import PostCategory from "./PostCategory";
 import { db } from "../../firebase/firebase-config";
 import { doc, getDoc } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
 const PostFeatureItemStyles = styled.div`
     width: 100%;
     border-radius: 16px;
     position: relative;
     height: 169px;
+    cursor: pointer;
     .post {
         &-image {
             width: 100%;
@@ -71,9 +73,11 @@ const PostFeatureItemStyles = styled.div`
     }
 `;
 const PostFeatureItem = ({ data, ...props }) => {
+    const navigate = useNavigate();
     const [user, setUser] = useState();
     const [cate, setCate] = useState();
-    const { author, category, image, title } = data;
+    const { author, category, image, title, slug, createdAt } = data;
+
     useEffect(() => {
         const fetch = async () => {
             const docRef = doc(db, "users", author);
@@ -82,7 +86,7 @@ const PostFeatureItem = ({ data, ...props }) => {
         };
         fetch();
     }, [author]);
-    console.log(user);
+
     useEffect(() => {
         const fetch = async () => {
             const docRef = doc(db, "categories", category);
@@ -91,15 +95,28 @@ const PostFeatureItem = ({ data, ...props }) => {
         };
         fetch();
     }, [category]);
+
+    const options = { month: "short", day: "numeric", year: "numeric" };
+    const milliseconds =
+        createdAt.seconds * 1000 + Math.floor(createdAt.nanoseconds / 1e6);
+    const date = new Date(milliseconds).toLocaleDateString("en-US", options);
+
     if (!data) return;
     return (
-        <PostFeatureItemStyles>
+        <PostFeatureItemStyles onClick={() => navigate(`/detail/${slug}`)}>
             <img src={image} alt="unsplash" className="post-image" />
             <div className="post-overlay"></div>
             <div className="post-content">
                 <div className="post-top">
-                    <PostCategory type="primary">{cate?.name}</PostCategory>
+                    {cate && (
+                        <PostCategory
+                            to={`/detail/${cate.slug}`}
+                            type="primary">
+                            {cate?.name}
+                        </PostCategory>
+                    )}
                     <div className="post-info">
+                        <span className="spot-time">{date}</span>
                         <span className="post-dot"></span>
                         <span className="post-author">{user?.fullname}</span>
                     </div>

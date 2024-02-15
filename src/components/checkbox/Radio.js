@@ -1,5 +1,6 @@
 import React from "react";
 import { useController } from "react-hook-form";
+import { CheckIcon } from "@heroicons/react/24/solid";
 
 const Radio = ({ checked, children, control, name, ...rest }) => {
     const { field } = useController({
@@ -17,11 +18,15 @@ const Radio = ({ checked, children, control, name, ...rest }) => {
                 {...field}
                 {...rest}
             />
-            <div className="flex items-center gap-x-3 font-medium cursor-pointer">
+            <div className="flex items-center font-medium cursor-pointer gap-x-3">
                 <div
-                    className={`w-7 h-7 rounded-full ${
+                    className={`w-7 h-7 flex items-center justify-center rounded-full ${
                         checked ? "bg-green-400" : "bg-gray-200"
-                    }`}></div>
+                    }`}>
+                    {checked && (
+                        <CheckIcon className="w-4 h-4 text-white"></CheckIcon>
+                    )}
+                </div>
                 <span>{children}</span>
             </div>
         </label>

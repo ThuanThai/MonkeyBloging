@@ -22,16 +22,21 @@ import {
 import { db } from "../../firebase/firebase-config";
 import { toast } from "react-toastify";
 import { useAuth } from "contexts/auth-context";
+import { useNavigate } from "react-router-dom";
 const PostAddNewStyles = styled.div``;
 
 const PostAddNew = () => {
+    const navigate = useNavigate();
     const { userInfo } = useAuth();
     const [userId, setUserId] = useState();
     const [loading, setLoading] = useState(false);
+
     useEffect(() => {
+        if (!userInfo) return;
         setUserId(userInfo.uid);
         setValue("author", userId);
     }, [userInfo]);
+
     const {
         control,
         watch,
@@ -82,9 +87,8 @@ const PostAddNew = () => {
         } catch (error) {
             console.log(error);
             setLoading(false);
-            return;
         }
-        setLoading(true);
+        setLoading(false);
         toast.success("Create new post successfully");
         reset({
             author: userId,

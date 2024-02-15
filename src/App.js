@@ -9,6 +9,7 @@ import PostManage from "module/post/PostManage";
 import DashboardPage from "pages/DashboardPage";
 import DashboardLayout from "module/dashboard/DashboardLayout";
 import PostAddNew from "module/post/PostAddNew";
+import CategoryAddNew from "module/category/CategoryAddNew";
 
 function App() {
     return (
@@ -24,7 +25,7 @@ function App() {
                     <Route path="/" element={<HompPage></HompPage>}></Route>
                     <Route path="*" element={<ErrorPage></ErrorPage>}></Route>
                     <Route
-                        path="/:slug"
+                        path="/detail/:slug"
                         element={<PostDetailsPage></PostDetailsPage>}></Route>
                     <Route element={<DashboardLayout></DashboardLayout>}>
                         <Route
@@ -36,7 +37,11 @@ function App() {
                         <Route
                             path="/dashboard"
                             element={<DashboardPage></DashboardPage>}></Route>
+                        <Route
+                            path="/manage/add-category"
+                            element={<CategoryAddNew />}></Route>
                     </Route>
+                    <Route path="*" element={<ErrorPage></ErrorPage>}></Route>
                 </Routes>
             </AuthProvider>
         </div>
