@@ -10,6 +10,8 @@ import DashboardPage from "pages/DashboardPage";
 import DashboardLayout from "module/dashboard/DashboardLayout";
 import PostAddNew from "module/post/PostAddNew";
 import CategoryAddNew from "module/category/CategoryAddNew";
+import CategoryManage from "module/category/CategoryManage";
+import CategoryUpdate from "module/category/CategoryUpdate";
 
 function App() {
     return (
@@ -38,8 +40,14 @@ function App() {
                             path="/dashboard"
                             element={<DashboardPage></DashboardPage>}></Route>
                         <Route
+                            path="/manage/category"
+                            element={<CategoryManage />}></Route>
+                        <Route
                             path="/manage/add-category"
                             element={<CategoryAddNew />}></Route>
+                        <Route
+                            path="/manage/update-category"
+                            element={<CategoryUpdate />}></Route>
                     </Route>
                     <Route path="*" element={<ErrorPage></ErrorPage>}></Route>
                 </Routes>

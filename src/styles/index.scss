@@ -1,6 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.dashboard-heading {
+    color: black;
+    size: 12px;
+}
 .container {
     width: 100%;
     max-width: 1180px;

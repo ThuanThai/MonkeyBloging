@@ -124,6 +124,7 @@ const PostAddNew = () => {
                 result.push({ id: doc.id, ...doc.data() });
             });
             setCatgories(result);
+            console.log("🚀 ~ getData ~ result:", result);
         };
         getData();
     }, []);

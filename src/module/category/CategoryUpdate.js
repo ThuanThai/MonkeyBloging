@@ -5,64 +5,74 @@ import FieldCheckBoxes from "components/field/FieldCheckBoxes";
 import { Input } from "components/input";
 import { Label } from "components/label";
 import { db } from "../../firebase/firebase-config";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { collection, doc, getDoc, updateDoc } from "firebase/firestore";
 import DashBoardHeading from "module/dashboard/DashBoardHeading";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useSearchParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import slugify from "slugify";
 import { categoryStatus } from "utils/constants";
-import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
-const CategoryAddNew = () => {
+const CategoryUpdate = () => {
+    const [param] = useSearchParams();
+    const id = param.get("id");
     const {
         control,
-        watch,
         formState: { isSubmitting },
         reset,
         handleSubmit,
+        watch,
     } = useForm({
         mode: "onChange",
-        defaultValues: {
-            name: "",
-            slug: "",
-            status: categoryStatus.APPROVE,
-            createdAt: new Date(),
-        },
     });
     const watchStatus = watch("status");
 
-    const handleAddNewCategory = async (values) => {
-        const cloneVals = { ...values };
-        cloneVals.slug = slugify(cloneVals.name || cloneVals.slug, {
-            lower: true,
-        });
-        cloneVals.status = Number(cloneVals.status);
-        const colref = collection(db, "categories");
+    useEffect(() => {
+        const fetchCategory = async () => {
+            const docRef = doc(db, "categories", id);
+            const res = await getDoc(docRef);
+            reset(res.data());
+        };
 
-        try {
-            await addDoc(colref, {
-                ...cloneVals,
-                createdAt: serverTimestamp(),
+        return () => fetchCategory();
+    }, [id, reset]);
+
+    if (!id) return null;
+    const handleUpdateCategory = async (values) => {
+        const cloneVals = { ...values };
+        const docRef = doc(db, "categories", id);
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, update it",
+        }).then(async (result) => {
+            await updateDoc(docRef, {
+                name: cloneVals.name,
+                slug: cloneVals.slug,
+                status: cloneVals.status,
             });
-            toast.success("Create new category sucessfully");
-        } catch (error) {
-            toast.error(error);
-        }
-        reset({
-            name: "",
-            slug: "",
-            status: categoryStatus.APPROVE,
-            createdAt: new Date(),
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: "Updated!",
+                    text: "Your category has been updated",
+                    icon: "success",
+                });
+            }
         });
     };
-
     return (
         <div>
             <DashBoardHeading
-                title="New category"
-                desc="Add new category"></DashBoardHeading>
+                title="Update Categorise"
+                desc={`Update your category: ${id}`}></DashBoardHeading>
             <form
-                onSubmit={handleSubmit(handleAddNewCategory)}
+                onSubmit={handleSubmit(handleUpdateCategory)}
                 autoComplete="off">
                 <div className="form-layout">
                     <Field>
@@ -115,11 +125,11 @@ const CategoryAddNew = () => {
                     type="submit"
                     disabled={isSubmitting}
                     isLoading={isSubmitting}>
-                    Add new category
+                    Update
                 </Button>
             </form>
         </div>
     );
 };
 
-export default CategoryAddNew;
+export default CategoryUpdate;
