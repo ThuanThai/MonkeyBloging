@@ -5,9 +5,13 @@ import {
     collection,
     deleteDoc,
     doc,
+    getDocs,
+    limit,
     onSnapshot,
     orderBy,
     query,
+    startAfter,
+    where,
 } from "firebase/firestore";
 import DashBoardHeading from "module/dashboard/DashBoardHeading";
 import React, { useEffect, useState } from "react";
@@ -16,12 +20,56 @@ import { ActionDelete, ActionEdit, ActionView } from "components/action";
 import { LabelStatus } from "components/label";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
+import { debounce } from "lodash";
 
 const CategoryManage = () => {
     const navigate = useNavigate();
     const [categories, setCatgories] = useState();
+    const [filter, setFilter] = useState("");
+    const [firstRef, setFirstRef] = useState(
+        query(collection(db, "categories"), orderBy("createdAt"), limit(1))
+    );
+
+    const handleChangeSearch = debounce((e) => {
+        setFilter(e.target.value);
+    }, 500);
+
+    const handleLoadMore = async () => {
+        // Query the first page of docs
+        try {
+            const documentSnapshots = await getDocs(firstRef);
+            const lastVisible =
+                documentSnapshots.docs[documentSnapshots.docs.length - 1];
+
+            const next = query(
+                collection(db, "categories"),
+                startAfter(lastVisible),
+                limit(1)
+            );
+            onSnapshot(next, (querySnapshot) => {
+                let res = [];
+                querySnapshot.forEach((doc) => {
+                    res.push({
+                        id: doc.id,
+                        ...doc.data(),
+                    });
+                });
+                setCatgories([...res]);
+            });
+            setFirstRef(next);
+        } catch (err) {}
+    };
+
     useEffect(() => {
-        const q = query(collection(db, "categories"), orderBy("createdAt"));
+        const colRef = collection(db, "categories");
+        const q = filter
+            ? query(
+                  colRef,
+                  where("name", ">=", filter.charAt(0).toUpperCase()),
+                  where("name", "<=", filter.charAt(0).toUpperCase() + "utf8"),
+                  limit(1)
+              )
+            : query(colRef, orderBy("createdAt"), limit(1));
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
             const res = [];
             querySnapshot.forEach((doc) => {
@@ -30,19 +78,12 @@ const CategoryManage = () => {
                     ...doc.data(),
                 });
             });
-            setCatgories(res);
-            console.log("🚀 ~ useEffect ~ res:", res);
+            setCatgories([...res]);
         });
         return () => unsubscribe();
-    }, []);
+    }, [filter]);
 
     const handleDeleteCategory = async (categoryID) => {
-        // try {
-        //     await deleteDoc(doc(db, "categories", categoryID));
-        //     toast.success("Delete successfully");
-        // } catch (error) {
-        //     toast.error("Error: Can not be deleted");
-        // }
         Swal.fire({
             title: "Are you sure?",
             text: "You won't be able to revert this!",
@@ -80,6 +121,14 @@ const CategoryManage = () => {
                     className="p-4 font-semibold text-green-500 bg-green-200 rounded-lg bg-opacity-60">
                     Add new Catgory
                 </button>
+            </div>
+            <div className="flex mb-10">
+                <input
+                    onChange={handleChangeSearch}
+                    type="text"
+                    placeholder="Search category..."
+                    className="px-4 py-3 ml-auto border-2 rounded-lg focus:outline-none"
+                />
             </div>
             {categories && categories.length > 0 && (
                 <Table>
@@ -127,6 +176,9 @@ const CategoryManage = () => {
                     </tbody>
                 </Table>
             )}
+            <button onClick={handleLoadMore} className="cursor-pointer">
+                Load more
+            </button>
         </div>
     );
 };
